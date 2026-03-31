@@ -21,35 +21,27 @@ public:
     int quantity;
     SIDE side;
 
-    // Order(double price, int quantity, SIDE side) : price(price), quantity(quantity), side(side) {}
-
-    // how do I use a constructor here correct?
+    Order(double price, int quantity, SIDE side) : price(price), quantity(quantity), side(side) {}
 };
 
-Order getOrder()
+void getOrder(std::vector<Order> &vec)
 {
     std::string BuySell;
-    Order order;
+    double price;
+    int quantity;
     std::cout << "Enter price: ";
-    std::cin >> order.price;
+    std::cin >> price;
     std::cout << "Enter Quantity; ";
-    std::cin >> order.quantity;
+    std::cin >> quantity;
     std::cout << "Buy or Sell : ";
     std::cin >> BuySell;
 
     /*
     Defaulting everything to sell if input is not "buy"
     */
-    if (BuySell == "buy" || BuySell == "Buy" || BuySell == "BUY")
-    {
-        order.side = SIDE::Buy;
-    }
-    else
-    {
-        order.side = SIDE::Sell;
-    }
-    std::cout << "_________________\n";
-    return order;
+    SIDE side = (BuySell == "Buy" || BuySell == "buy" || BuySell == "BUY") ? SIDE::Buy : SIDE::Sell;
+
+    vec.emplace_back(price, quantity, side);
 }
 
 void printVector(const std::vector<Order> &order)
@@ -80,7 +72,7 @@ int main()
 
     for (int i = 0; i < 2; i++)
     {
-        order.emplace_back(getOrder());
+        getOrder(order);
     }
     std::cout << "Size of the class Order is: " << sizeof(Order) << "\n";
     printVector(order);

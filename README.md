@@ -19,3 +19,8 @@ In this phase, I optimized the `Order` class by replacing `std::string` with a s
 ```bash
 clang++ -std=c++17 OrderStorageSystem.cpp -o OrderStorageSystem
 ./OrderStorageSystem
+
+---
+* **Zero-Copy Construction:** Refactored `getOrder` to accept a `std::vector<Order>&`.
+* **Direct Emplacement:** Switched from returning a temporary object to using `emplace_back(price, quantity, side)`, constructing the object directly in the vector's pre-allocated heap memory.
+* **Pass-by-Reference:** Optimized function calls by passing the container by reference, avoiding unnecessary stack copies of the vector manager itself.
