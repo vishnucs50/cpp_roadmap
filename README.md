@@ -1,24 +1,21 @@
-# HFT Low-Latency C++ Roadmap: Week 1 (Updated)
-## Memory Optimization & Object-Oriented Refactoring
+# HFT Low-Latency C++ Roadmap: Week 1
+## Memory Optimization & Data Contiguity
 
-### 🎯 Objective
-Refactor the Order Storage system to use custom types (Enums) and evaluate the impact of data types on memory footprint and cache-friendliness.
+### 🎯 Milestone: 16-Byte Order Object
+In this phase, I optimized the `Order` class by replacing `std::string` with a scoped `enum`. This reduced the memory footprint of a single order by **60%**, significantly improving CPU cache efficiency.
 
-### 🚀 Key Improvements
-* **Enum Conversion:** Replaced `std::string` with `enum class SIDE`. 
-    * *Result:* Reduced `Order` object size from **40 bytes** to **16 bytes**.
-* **OOP Structure:** Encapsulated logic within the `Order` class, moving toward a more professional architecture.
-* **Emplacement Logic:** Utilized `emplace_back` to signal intent for in-place construction (preparing for Week 2 move semantics).
+### 🚀 Key Technical Achievements
+* **Enum Class Implementation:** Defined `SIDE` as an enum to replace heap-allocated strings.
+* **Memory Footprint Reduction:** Verified via `sizeof(Order)` that the object shrunk from **40 bytes to 16 bytes**.
+* **Heap Analysis:** Confirmed via pointer arithmetic that orders are stored contiguously on the heap with exactly a `0x10` (16-byte) offset.
+* **Predictable Allocation:** Used `vector::reserve()` to ensure zero reallocations during the "hot loop" of order entry.
 
-### 📊 Memory Analysis (Post-Optimization)
-By moving from a string to an enum, the memory offset between elements shrunk significantly:
-- **Order [0] at:** `0x100e69b60`
-- **Order [1] at:** `0x100e69b70` (+16 bytes)
-- **Order [2] at:** `0x100e69b80` (+16 bytes)
+### 📊 Memory Layout (Verified via Output)
+- **Order [0]:** `0x10374d930`
+- **Order [1]:** `0x10374d940` (Exactly +16 bytes)
+- **Cache Efficiency:** 4 Orders now fit into a single 64-byte CPU Cache Line (previously only 1).
 
-This 60% reduction in object size allows for significantly better cache utilization and lower memory bandwidth usage.
-
-### 🛠 How to Run
+### 🛠 How to Build
 ```bash
 clang++ -std=c++17 OrderStorageSystem.cpp -o OrderStorageSystem
 ./OrderStorageSystem
