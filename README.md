@@ -1,31 +1,22 @@
-# HFT Low-Latency C++ Roadmap: Week 1
-## Order Storage & Memory Analysis
-
-This project is part of a 6-week intensive roadmap focused on building a high-performance **Limit Order Book (LOB)**. Week 1 focuses on C++ memory foundations, specifically how `std::vector` manages heap memory and how to eliminate latency spikes.
+# HFT Low-Latency C++ Roadmap: Week 1 (Updated)
+## Memory Optimization & Object-Oriented Refactoring
 
 ### 🎯 Objective
-Understand the physical memory layout of C++ objects and the performance implications of dynamic array resizing.
+Refactor the Order Storage system to use custom types (Enums) and evaluate the impact of data types on memory footprint and cache-friendliness.
 
-### 🧠 Key Concepts Explored
-* **Stack vs. Heap:** Observed the address gap between the vector object (stack) and its underlying data (heap).
-* **Predictable Memory:** Used `std::vector::reserve()` to pre-allocate memory, ensuring $O(1)$ insertion time by avoiding expensive reallocations.
-* **Memory Alignment:** Analyzed the 40-byte memory offset between `Order` objects to understand compiler padding and data contiguity.
-* **Data Contiguity:** Verified that `std::vector` stores elements in a contiguous block, which is essential for CPU cache efficiency.
+### 🚀 Key Improvements
+* **Enum Conversion:** Replaced `std::string` with `enum class SIDE`. 
+    * *Result:* Reduced `Order` object size from **40 bytes** to **16 bytes**.
+* **OOP Structure:** Encapsulated logic within the `Order` class, moving toward a more professional architecture.
+* **Emplacement Logic:** Utilized `emplace_back` to signal intent for in-place construction (preparing for Week 2 move semantics).
 
-### 💻 Implementation Details
-The `OrderStorageSystem.cpp` performs the following:
-1. Defines an `Order` class representing a financial trade.
-2. Pre-allocates heap memory for exactly 3 orders.
-3. Captures user input on the stack and moves/copies it to the pre-allocated heap space.
-4. Outputs the hex memory addresses of each element to verify zero-reallocation behavior.
+### 📊 Memory Analysis (Post-Optimization)
+By moving from a string to an enum, the memory offset between elements shrunk significantly:
+- **Order [0] at:** `0x100e69b60`
+- **Order [1] at:** `0x100e69b70` (+16 bytes)
+- **Order [2] at:** `0x100e69b80` (+16 bytes)
 
-### 📊 Performance Analysis
-In this experiment, the memory address of the first element remained constant:
-- **Address of orders[0]:** `0x102f299f0`
-- **Address of orders[1]:** `0x102f29a18` (+40 bytes)
-- **Address of orders[2]:** `0x102f29a40` (+40 bytes)
-
-By using `reserve(3)`, we ensured that the capacity did not grow, preventing a "stop-the-world" memory copy during the execution loop.
+This 60% reduction in object size allows for significantly better cache utilization and lower memory bandwidth usage.
 
 ### 🛠 How to Run
 ```bash
