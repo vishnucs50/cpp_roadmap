@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/vishnukamaraju/Documents/cpp/Week1/StackvsHeap'
+relocations:     []
+...
